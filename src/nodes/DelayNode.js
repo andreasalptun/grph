@@ -10,7 +10,7 @@ class DelayNode extends Node {
     this.initPlugs([this.plugs, '#time'], this.plugs);
     
     this.setProcessor('#time', (input, value) => {
-      Node.log.info(this, `Setting delay time to ${value} second(s)`);
+      Node.log.info(this, `time = ${value} sec`);
       this.time = value;
     });
 

@@ -5,6 +5,8 @@ class Plug {
     this.node = node;
   }
   
+  // TODO plug labels (rename name to id)
+  
   get desc() {
     return `${this.node.name}[${this.name || this.index}]`;
   }

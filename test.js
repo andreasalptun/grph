@@ -1,14 +1,23 @@
 const grph = require('./index');
 
 const delay = new grph.DelayNode();
+const schedule = new grph.ScheduleNode('*/3 * * * * *');
 const printer = new grph.PrintNode();
+const pulse = new grph.PulseNode({
+  plugs: ['water-heater', 'tho']
+});
 
-delay.output().connectTo(printer.input());
+let count = 0;
+schedule
+  .output()
+  .setFilter(value => count < 5 ? value : null)
+  .connectTo(pulse.input());
+pulse.output().connectTo(printer.input());
 
 
 
 
-delay.input().receive(1);
+// delay.input().receive(1);
 
 // delay.output().disconnect();
 
