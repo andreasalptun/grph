@@ -52,7 +52,7 @@ class Output extends Plug {
     // TODO throw error if input name starts with > in superclass
     const oldValue = this.value;
     const newValue = this.value = this.filter(value);
-    if (this.connectedTo) {
+    if (this.connectedTo && typeof(newValue) === 'number') {
       if (this.connectedTo.name.startsWith('>')) {
         this.connectedTo.push(); //?
       } else {
