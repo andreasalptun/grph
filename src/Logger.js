@@ -40,13 +40,13 @@ const verbosity = {
 };
 
 function print(obj, level, args) {
-  const name = (obj||{}).name;
+  const name = (obj || {}).name;
   if (level <= (verbosity[name] || verbosity.common)) {
     levels[level].func.apply(
       null,
       [
         levels[level].color(`[${levels[level].title}]`),
-        chalk.gray(`${name || 'Unnamed'}`)
+        chalk.gray(`${name || ''}`.padEnd(16, ' '))
       ].concat(Array.from(args))
     );
   }
@@ -60,23 +60,23 @@ module.exports = Object.assign(Logger, {
     }
     verbosity[name] = level;
   },
-  
+
   debug(obj, ...args) {
     print(obj, Logger.DEBUG, args);
   },
-  
+
   info(obj, ...args) {
     print(obj, Logger.INFO, args);
   },
-  
+
   warn(obj, ...args) {
     print(obj, Logger.WARN, args);
   },
-  
+
   error(obj, ...args) {
     print(obj, Logger.ERROR, args);
   },
-  
+
   print(obj, ...args) {
     print(obj, 0, args);
   }
