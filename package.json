@@ -1,0 +1,29 @@
+{
+  "name": "grph",
+  "version": "1.0.0",
+  "description": "Graph programming. Create node apps by connecting graph nodes. Use standard nodes or easily create your own.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andreasalptun/grph.git"
+  },
+  "keywords": [
+    "graph",
+    "code",
+    "nodes"
+  ],
+  "author": "Andreas Alptun <andreas.alptun@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/andreasalptun/grph/issues"
+  },
+  "homepage": "https://github.com/andreasalptun/grph#readme",
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "intersect-objects": "^1.0.0",
+    "matcher": "^2.1.0"
+  }
+}
