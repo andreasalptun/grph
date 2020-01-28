@@ -5,7 +5,7 @@ class DelayNode extends Node {
     super(config, {
       plugs: 1,
       time: 1.0, // seconds
-    }, 'plugs');
+    }, 'time');
 
     this.initPlugs([this.plugs, '#time'], this.plugs);
     
