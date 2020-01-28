@@ -31,12 +31,12 @@ const levels = {
   [Logger.DEBUG]: {
     title: 'Debug',
     func: console.debug,
-    color: chalk.bgMaroon
+    color: chalk.bgMagenta
   }
 }
 
 const verbosity = {
-  common: Logger.INFO
+  common: Logger.WARN
 };
 
 function print(obj, level, args) {

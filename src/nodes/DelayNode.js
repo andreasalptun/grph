@@ -9,15 +9,15 @@ class DelayNode extends Node {
 
     this.initPlugs([this.plugs, '#time'], this.plugs);
     
-    this.setProcessor('#time', (input, value) => {
-      Node.log.info(this, `time = ${value} sec`);
-      this.time = value;
+    this.setProcessor('#time', (input, data) => {
+      Node.log.info(this, `time = ${data.value} sec`);
+      this.time = data.value;
     });
 
-    this.setProcessor('*', (input, value) => {
+    this.setProcessor('*', (input, data) => {
       Node.log.info(this, `wait for ${this.time} sec`);
       setTimeout(() => {
-        this.output(input.index).send(value);
+        this.output(input.index).send(data);
       }, 1000 * this.time);
     });
   }

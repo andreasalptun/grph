@@ -20,10 +20,10 @@ class Output extends Plug {
     this.connectedTo = null;
   }
 
-  setValue(initValue) {
-    if (typeof(initValue) !== 'number')
-      throw new TypeError('Value must be a number');
-    this.value = this.filter(initValue);
+  setValue(value) {
+    this._checkValue(value);
+    this.value = this.filter(value);
+    this._checkValue(this.value);
     return this;
   }
 
@@ -44,20 +44,28 @@ class Output extends Plug {
     return this;
   }
 
-  send(value) {
-    if (typeof(value) !== 'number' || Number.isNaN(value)) {
-      throw new TypeError(`Output value must be a number, was ${typeof(value)}`);
+  send(data) {
+
+    // Handle numeric data
+    if (typeof(data) === 'number') {
+      data = {
+        value: data
+      };
     }
 
     // TODO throw error if input name starts with > in superclass
+
     const oldValue = this.value;
-    const newValue = this.value = this.filter(value);
-    if (this.connectedTo && typeof(newValue) === 'number') {
+    this.setValue(data.value);
+
+    if (this.connectedTo) {
       if (this.connectedTo.name.startsWith('>')) {
         this.connectedTo.push(); //?
       } else {
-        Logger.debug(this.node, `Send ${this.desc}] > ${newValue} > ${this.connectedTo.desc}`);
-        this.connectedTo.receive(oldValue, newValue);
+        Logger.debug(this.node, `Send ${this.desc}] > ${this.value} > ${this.connectedTo.desc}`);
+        this.connectedTo.receive(Object.assign({}, data, {
+          value: this.value
+        }), oldValue);
       }
     }
   }

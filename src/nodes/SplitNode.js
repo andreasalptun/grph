@@ -8,8 +8,8 @@ class SplitNode extends Node {
 
     this.initPlugs('in', this.outputPlugs);
 
-    this.setProcessor('in', (input, value) => {
-      this.outputs.forEach(output => output.send(value));
+    this.setProcessor('in', (input, data) => {
+      this.outputs.forEach(output => output.send(data));
     });
   }
 }

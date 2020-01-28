@@ -1,18 +1,48 @@
+const express = require('express');
+
 const grph = require('./index');
 
 const delay = new grph.DelayNode();
-const schedule = new grph.ScheduleNode('*/3 * * * * *');
+// const schedule = new grph.ScheduleNode('*/3 * * * * *');
 const printer = new grph.PrintNode();
-const pulse = new grph.PulseNode({
-  plugs: ['water-heater', 'tho']
+// const pulse = new grph.PulseNode({
+//   plugs: ['water-heater', 'tho']
+// });
+
+const app = express();
+
+grph.Logger.setLevel('HttpNode', grph.Logger.DEBUG);
+
+app.listen(process.env.HTTP_LISTEN_PORT, process.env.HTTP_LISTEN_ADDR, async () => {
+  console.log(`Server listening on http://${process.env.HTTP_LISTEN_ADDR}:${process.env.HTTP_LISTEN_PORT}`);
+
+  const request = new grph.HttpNode(app, {
+    route: '/api/v1/syno/:plug/:value?',
+    plugs: ['set-home', {
+      name: 'get-home',
+      hasResponseInput: true
+    }]
+  });
+  // 
+  // const state = new Graph.SynoStateNode();
+  // 
+  // const print = new Graph.PrintNode();
+  // 
+  // request.output('set-home').connectTo(state.input('set-home'));
+  // request.output('get-home').connectTo(state.input('>home'));
+  // state.output('home').connectTo(print.input());
+  
+  request.output('get-home').connectTo(delay.input());
+  delay.output().setFilter(valu<e=>2*value).connectTo(request.input());
 });
 
-let count = 0;
-schedule
-  .output()
-  .setFilter(value => count < 5 ? value : null)
-  .connectTo(pulse.input());
-pulse.output().connectTo(printer.input());
+
+// let count = 0;
+// schedule
+//   .output()
+//   .setFilter(value => count < 5 ? value : null)
+//   .connectTo(pulse.input());
+// pulse.output().connectTo(printer.input());
 
 
 

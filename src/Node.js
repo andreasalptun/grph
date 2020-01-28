@@ -3,6 +3,8 @@ const Output = require('./Output');
 const Logger = require('./Logger');
 
 const intersectObjects = require('intersect-objects').default;
+const deepCopy = require('deep-copy');
+const blacklist = require('blacklist');
 
 function checkType(type) {
   if (![Node.INPUT, Node.OUTPUT].includes(type)) {
@@ -14,18 +16,23 @@ function parsePlugs(type, defaultName, ...plugs) {
   checkType(type);
 
   function unrollNumerals(array, entry) {
-    let count,
+    let count, attrs,
       start = array.length,
       name = defaultName.toString();
     if (typeof(entry) === 'number') {
       count = entry;
     } else if (typeof(entry) === 'object' && 'count' in entry) {
       count = entry.count;
-      name = entry.name;
+      name = entry.name || defaultName.toString();
+      if (Object.keys(entry).length > 1) {
+        attrs = blacklist(entry, 'count', 'name');
+      }
       start = 0;
     }
     return array.concat(typeof(count) === 'number' ?
-      Array.apply(null, Array(count)).map((_, i) => name + (start + i)) : entry);
+      Array.apply(null, Array(count)).map((_, i) => Object.assign({
+        name: name + (start + i)
+      }, attrs)) : entry);
   }
 
   function objectifyStrings(entry) {
@@ -43,11 +50,11 @@ function parsePlugs(type, defaultName, ...plugs) {
   //   return entry;
   // }
 
-  return plugs
+  return deepCopy(plugs
     .reduce((array, entry) => array.concat(entry), []) // Merge arguments
     .filter(entry => entry) // Remove null entries
     .reduce(unrollNumerals, []) // Unroll numerals
-    .map(objectifyStrings) // Objectify strings
+    .map(objectifyStrings)); // Objectify strings
   // .map(resolveModifiers); // Resolve modifiers
 }
 
@@ -71,7 +78,7 @@ function findPlug(node, type, name = 0) {
       throw new RangeError(`${type.name} with index ${name} out of range.`);
     }
   } else {
-    throw new Error(`${type.name} pin not found. Argument must be string or number, was ${typeof(name)}.`);
+    throw new Error(`${type.name} not found. Argument must be string or number, was ${typeof(name)}.`);
   }
 
   return plugs[index];
@@ -114,31 +121,21 @@ class Node {
       intersectObjects(defaultConfig, config));
   }
 
-  // Each param can be a number (unnamed pins), a string (name) an object*
+  // Each param can be a number (unnamed plugs), a string (name) an object*
   // or an array of strings (names) and objects*
   // (*) object must have a name and can have data (userdata) or,
   // if input, trigger (poke/change/rise/fall) 
 
   initPlugs(inputs, outputs, opt = {}) { // TODO rename to plugs
-    // function cloneArrayObjects(array) {
-    //   if (Array.isArray(array)) {
-    //     return array.map(function(entry) {
-    //       if (typeof(entry) === 'object')
-    //         return Object.assign({}, entry);
-    //       return entry;
-    //     });
-    //   }
-    //   return array;
-    // }
 
     outputs = parsePlugs(
       Node.OUTPUT,
-      opt.outputName || 'out',
-      // cloneArrayObjects(outputs));
+      opt.defaultOutputName || opt.defaultName || 'out',
       outputs);
 
-    if (typeof(opt.modifyOutput) === 'function') {
-      inputs.forEach(opt.modifyOutput);
+    // Let subnode modify outputs after parsing 
+    if (typeof(opt.afterParsingOutput) === 'function') {
+      outputs = outputs.filter(opt.afterParsingOutput);
     }
 
     const pushInputs = outputs
@@ -153,15 +150,16 @@ class Node {
 
     inputs = parsePlugs(
       Node.INPUT,
-      opt.inputName || 'in',
-      // cloneArrayObjects(inputs),
+      opt.defaultInputName || opt.defaultName || 'in',
       inputs,
       pushInputs);
 
-    if (typeof(opt.modifyInput) === 'function') {
-      inputs.forEach(opt.modifyInput);
+    // Let subnode modify inputs after parsing 
+    if (typeof(opt.afterParsingInput) === 'function') {
+      inputs = inputs.filter(opt.afterParsingInput);
     }
 
+    // Crete Input/Output objects
     this.inputs = inputs.map((args, i) => new Input(args, i, this));
     this.outputs = outputs.map((args, i) => new Output(args, i, this));
 

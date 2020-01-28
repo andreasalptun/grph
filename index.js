@@ -1,5 +1,6 @@
 module.exports = {
   Node: require('./src/Node'),
+  Logger: require('./src/Logger'),
   
   // Utility nodes
   PrintNode: require('./src/nodes/PrintNode'),
@@ -7,6 +8,9 @@ module.exports = {
   
   // Timing nodes
   DelayNode: require('./src/nodes/DelayNode'),
-  ScheduleNode: require('./src/nodes/ScheduleNode'),
   PulseNode: require('./src/nodes/PulseNode'),
+  ScheduleNode: require('./src/nodes/ScheduleNode'),
+  
+  // Networking nodes
+  HttpNode: require('./src/nodes/HttpNode'),
 };

@@ -10,12 +10,12 @@ class PulseNode extends Node {
     // TODO force number
     this.initPlugs([this.plugs, '#duration'], this.plugs);
 
-    this.setProcessor('#duration', (input, value)=>{
+    this.setProcessor('#duration', (input, data)=>{
       Node.log.info(this, `duration = ${value} sec`);
       this.duration = value;
     });
 
-    this.setProcessor('*', (input, value) => {
+    this.setProcessor('*', (input, data) => {
 
       Node.log.info(this, 'Pulse HIGH');
 

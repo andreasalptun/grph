@@ -24,33 +24,26 @@ class Input extends Plug {
     return this;
   }
 
-  receive(oldValue, newValue) {
-    if (typeof(newValue) === 'undefined') {
-      newValue = oldValue;
-      oldValue = Node.LOW;
-    }
-
-    if (typeof(newValue) !== 'number' || Number.isNaN(newValue)) {
-      throw new TypeError(`Input value must be a number, was ${typeof(newValue)}`);
-    }
+  receive(data, oldValue = Node.LOW) {
+    this._checkValue(data.value);
 
     if (!this.cachedProcessor) {
       this.cachedProcessor = findMatchingProcessor(this);
 
       if (typeof(this.cachedProcessor) !== 'object' || typeof(this.cachedProcessor.func) !== 'function') {
         throw new Error('No processor found for input plug named ' + this.name + ', has ' +
-          Array.from(this.node.processors.keys()).join(', '));
+          (Array.from(this.node.processors.keys()).join(', ') || 'none'));
       }
     }
 
     const trig = this.trigger;
     if (!trig || trig == 'pulse' || // Default
-      trig == 'change' && newValue != oldValue ||
-      trig == 'rise' && newValue > oldValue ||
-      trig == 'fall' && newValue < oldValue) {
+      trig == 'change' && data.value != oldValue ||
+      trig == 'rise' && data.value > oldValue ||
+      trig == 'fall' && data.value < oldValue) {
       setImmediate(() => {
-        Logger.debug(this.node, `Receive ${newValue} > ${this.desc}`);
-        this.cachedProcessor.func(this, newValue)
+        Logger.debug(this.node, `Receive ${data.value} > ${this.desc}`);
+        this.cachedProcessor.func(this, data);
       });
     }
   }

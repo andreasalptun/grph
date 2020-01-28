@@ -10,8 +10,8 @@ class PrintNode extends Node {
 
     this.initPlugs(this.inputPlugs);
 
-    this.setProcessor('*', (input, value) => {
-      Node.log.print(this, `${input.name} received value ${value}`);
+    this.setProcessor('*', (input, data) => {
+      Node.log.print(this, `${input.name} received value ${data.value}`);
     });
   }
 }

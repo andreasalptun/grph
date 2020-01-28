@@ -10,6 +10,13 @@ class Plug {
   get desc() {
     return `${this.node.name}[${this.name || this.index}]`;
   }
+
+  _checkValue(value) {
+    if (typeof(value) !== 'number' || Number.isNaN(value)) {
+      throw new TypeError('Value must be a number or an object, was ' +
+      Number.isNaN(value) ? 'NaN' : typeof(value));
+    }    
+  }
 }
 
 module.exports = Plug;
