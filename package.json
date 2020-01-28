@@ -16,7 +16,7 @@
     "block",
     "raspberry pi"
   ],
-  "author": "Andreas Alptun <npm@pickalurv.com>",
+  "author": "Andreas Alptun <andreas@grph.dev>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/andreasalptun/grph/issues"
