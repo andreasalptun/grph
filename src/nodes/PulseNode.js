@@ -11,8 +11,8 @@ class PulseNode extends Node {
     this.initPlugs([this.plugs, '#duration'], this.plugs);
 
     this.setProcessor('#duration', (input, data)=>{
-      Node.log.info(this, `duration = ${value} sec`);
-      this.duration = value;
+      Node.log.info(this, `duration = ${data.value} sec`);
+      this.duration = data.value;
     });
 
     this.setProcessor('*', (input, data) => {
