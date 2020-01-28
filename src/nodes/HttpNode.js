@@ -27,9 +27,11 @@ class HttpNode extends Node {
     this.setProcessor('*-response', (input, data) => {
       const output = this.output(input.requestOutputName);
       if (output && typeof(data.res) === 'object') {
-        data.res.json({
+        const body = {
           value: data.value
-        });
+        };
+        Node.log.info(this, `response ${data.res.req.url} < ${JSON.stringify(body)}`);
+        data.res.json(body);
       }
     });
 
@@ -41,6 +43,7 @@ class HttpNode extends Node {
         Node.log.warn(this, 'bad request, value was ' + req.params.value)
         res.sendStatus(400);
       } else {
+        Node.log.info(this, `request ${req.url}`);
         output.send({
           value,
           res: output.hasResponseInput ? res : null
