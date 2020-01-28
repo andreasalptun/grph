@@ -1,6 +1,6 @@
 {
   "name": "grph",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Graph programming. Create node apps by connecting graph nodes. Use standard nodes or easily create your own.",
   "main": "index.js",
   "scripts": {
@@ -12,10 +12,11 @@
   },
   "keywords": [
     "graph",
-    "code",
-    "nodes"
+    "nodes",
+    "block",
+    "raspberry pi"
   ],
-  "author": "Andreas Alptun <andreas.alptun@gmail.com>",
+  "author": "Andreas Alptun <npm@pickalurv.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/andreasalptun/grph/issues"
