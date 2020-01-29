@@ -30,32 +30,36 @@ function parsePlugs(type, defaultName, ...plugs) {
     if (typeof(entry) === 'number') {
       count = entry;
     } else if (typeof(entry) === 'object') {
+
+      if (entry.name && entry.name != name) {
+        name = entry.name;
+        start = 0;
+      }
       count = entry.count;
-      name = entry.name || defaultName.toString();
       attrs = blacklist(entry, 'count', 'name');
-      start = 0;
+
+      if (typeof(count) !== 'number') {
+        return array.concat(Object.assign({
+          name
+        }, attrs));
+      }
+    } else {
+      throw new TypeError(`Plug config must be (array of) string, number or object, was ${typeof(entry)}`);
     }
 
-    return array.concat(typeof(count) === 'number' ?
+    return array.concat(
       Array.apply(null, Array(count)).map((_, i) => Object.assign({
         name: name + (start + i)
-      }, attrs)) : Object.assign(entry, attrs, {
-        name
-      }));
+      }, attrs))
+    );
   }
 
-  function objectifyStrings(entry) {
-    return typeof(entry) === 'string' ? {
-      name: entry
-    } : entry;
-  }
 
   return deepCopy(plugs
     .reduce((array, entry) => array.concat(entry), []) // Merge arguments
     .filter(entry => entry) // Remove null entries
     .reduce(unroll, []));
 }
-
 
 function findPlug(node, type, name = 0) {
   checkType(type);
