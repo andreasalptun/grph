@@ -45,9 +45,20 @@ class Output extends Plug {
   }
 
   send(data) {
+    
+    if(typeof(data) === 'undefined') {
+      Logger.warn(this.node, 'sending undefined data, ignoring');
+      return;
+    }
 
     // Handle numeric data
     if (typeof(data) === 'number') {
+      
+      if(Number.isNaN(data)) {
+        Logger.warn(this.node, 'sending NaN data value, ignoring');
+        return;
+      }
+      
       data = {
         value: data
       };
