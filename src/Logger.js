@@ -42,12 +42,11 @@ const verbosity = {
 function print(obj, level, args) {
   const name = (obj || {}).name;
   if (level <= (verbosity[name] || verbosity.common)) {
-    levels[level].func.apply(
+    levels[level].func.call(
       null,
-      [
-        levels[level].color(`[${levels[level].title}]`),
+      [levels[level].color(`[${levels[level].title}]`),
         chalk.gray(`${name || ''}`.padEnd(16, ' '))
-      ].concat(Array.from(args))
+      ].concat(Array.from(args)).join(' ')
     );
   }
 }
