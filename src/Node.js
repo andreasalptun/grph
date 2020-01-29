@@ -1,5 +1,6 @@
 const Input = require('./Input');
 const Output = require('./Output');
+const Util = require('./Util');
 const Logger = require('./Logger');
 
 const intersectObjects = require('intersect-objects').default;
@@ -15,24 +16,32 @@ function checkType(type) {
 function parsePlugs(type, defaultName, ...plugs) {
   checkType(type);
 
-  function unrollNumerals(array, entry) {
+  function unroll(array, entry) {
+    if (typeof(entry) === 'string') {
+      return array.concat({
+        name: entry
+      });
+    }
+
     let count, attrs,
       start = array.length,
       name = defaultName.toString();
+
     if (typeof(entry) === 'number') {
       count = entry;
-    } else if (typeof(entry) === 'object' && 'count' in entry) {
+    } else if (typeof(entry) === 'object') {
       count = entry.count;
       name = entry.name || defaultName.toString();
-      if (Object.keys(entry).length > 1) {
-        attrs = blacklist(entry, 'count', 'name');
-      }
+      attrs = blacklist(entry, 'count', 'name');
       start = 0;
     }
+
     return array.concat(typeof(count) === 'number' ?
       Array.apply(null, Array(count)).map((_, i) => Object.assign({
         name: name + (start + i)
-      }, attrs)) : entry);
+      }, attrs)) : Object.assign(entry, attrs, {
+        name
+      }));
   }
 
   function objectifyStrings(entry) {
@@ -41,21 +50,10 @@ function parsePlugs(type, defaultName, ...plugs) {
     } : entry;
   }
 
-  // function resolveModifiers(entry) {
-  //   const modifierObj = MODIFIERS.get(type)[entry.name.charAt(0)];
-  //   if (typeof(modifierObj) !== 'undefined') {
-  //     entry.name = entry.name.substring(1);
-  //     return Object.assign(entry, modifierObj);
-  //   }
-  //   return entry;
-  // }
-
   return deepCopy(plugs
     .reduce((array, entry) => array.concat(entry), []) // Merge arguments
     .filter(entry => entry) // Remove null entries
-    .reduce(unrollNumerals, []) // Unroll numerals
-    .map(objectifyStrings)); // Objectify strings
-  // .map(resolveModifiers); // Resolve modifiers
+    .reduce(unroll, []));
 }
 
 
@@ -209,9 +207,10 @@ class Node {
   }
 }
 
-// Mixin NodeDefs and Logger for convenience
+// Mixin NodeDefs and Util+Logger for convenience
 Object.assign(Node, require('./NodeDefs'), {
-  log: Logger
+  log: Logger,
+  util: Util,
 });
 
 module.exports = Node;

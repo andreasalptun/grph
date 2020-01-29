@@ -28,7 +28,8 @@
     "cron": "^1.8.2",
     "deep-copy": "^1.4.2",
     "intersect-objects": "^1.0.0",
-    "matcher": "^2.1.0"
+    "matcher": "^2.1.0",
+    "onoff": "^5.0.1"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",

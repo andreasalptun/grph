@@ -13,4 +13,9 @@ module.exports = {
   
   // Networking nodes
   HttpNode: require('./src/nodes/HttpNode'),
+  
+  // Rapberry PI nodes
+  rpi: {
+    GpioNode: require('./src/nodes/rpi/GpioNode'),
+  },
 };
