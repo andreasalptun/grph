@@ -145,7 +145,7 @@ class Node {
       .map(output => {
         return {
           name: '>' + output.name,
-          pushOutput: output,
+          pushOutputName: output.name,
           pushed: true,
         }
       });
@@ -165,9 +165,13 @@ class Node {
     this.inputs = inputs.map((args, i) => new Input(args, i, this));
     this.outputs = outputs.map((args, i) => new Output(args, i, this));
 
-    Logger.info(this, 'in (' +
-      (inputs.map(input => input.name).join(', ') || '-') + '), out (' +
-      (outputs.map(output => output.name).join(', ') || '-') + ')');
+    if (inputs.length > 0)
+      Logger.info(this, 'input plugs (' + (inputs.map(input => input.name).join(', ') || '-') + ')');
+    if (outputs.length > 0)
+      Logger.info(this, 'output plugs (' + (outputs.map(output => output.name).join(', ') || '-') + ')');
+        
+    if(!inputs.length && !output.length)
+      Logger.warn(this, 'no plugs');
   }
 
   setProcessor(pattern, processor) {

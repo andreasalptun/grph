@@ -20,4 +20,8 @@ module.exports = {
   RISE: 'rise',
   FALL: 'fall',
   CHANGE: 'change',
+  
+  // Processor patterns (see https://github.com/sindresorhus/matcher)
+  PUSHED: '>*',
+  CATCH: '*', 
 };
