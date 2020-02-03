@@ -42,7 +42,7 @@ const request = new grph.HttpNode(app, { // <= express app
   route: '/api/:plug/:value',
   plugs: {
     name:'calc-square',
-    hasResponseInput: true // create an input for the response
+    response: true // create an input for the response
   }  
 });
 const delay = new grph.DelayNode(2.5); // seconds

@@ -1,24 +1,22 @@
 const Node = require('../Node');
 
-// route: (/api/:output/:value)
-// outputs: ('default') or {name:'my-endpoint', responseInput:true}
-
 class HttpNode extends Node {
   constructor(app, config) {
     super(config, {
       route: '/api/:plug/:value?',
       plugs: 1 // 'request0'
     });
+    // TODO method
 
     Node.log.info(this, 'route ' + this.route);
 
     this.initPlugs(this.plugs, this.plugs, {
       defaultName: 'request',
       afterParsingInput: input => {
-        if (input.hasResponseInput) {
+        if (input.response) {
           input.requestOutputName = input.name;
           input.name += '-response';
-          delete input.hasResponseInput;
+          delete input.response;
           return true;
         }
       }
@@ -46,10 +44,10 @@ class HttpNode extends Node {
         Node.log.info(this, `request ${req.url}`);
         output.send({
           value,
-          res: output.hasResponseInput ? res : null
+          res: output.response ? res : null
         });
 
-        if (!output.hasResponseInput) {
+        if (!output.response) {
           res.sendStatus(200);
         }
       }
