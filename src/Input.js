@@ -25,6 +25,19 @@ class Input extends Plug {
   }
 
   receive(data, oldValue = Node.LOW) {
+
+    if(typeof(data) === 'number') {
+      data = {
+        value: data
+      }
+    }
+    
+    if (typeof(data) === 'undefined') {
+      data = {
+        value: 1
+      };
+    }
+
     this._checkValue(data.value);
 
     if (!this.cachedProcessor) {
