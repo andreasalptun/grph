@@ -140,6 +140,14 @@ class Node {
       outputs = outputs.filter(opt.afterParsingOutput);
     }
 
+    // Set pushed if node name starts with @
+    outputs
+      .filter(output => output.name.startsWith('@'))
+      .forEach(output => {
+        output.name = output.name.substring(1);
+        output.pushed = true;
+      });
+
     const pushInputs = outputs
       .filter(output => output.pushed)
       .map(output => {
@@ -169,8 +177,8 @@ class Node {
       Logger.info(this, 'input plugs (' + (inputs.map(input => input.name).join(', ') || '-') + ')');
     if (outputs.length > 0)
       Logger.info(this, 'output plugs (' + (outputs.map(output => output.name).join(', ') || '-') + ')');
-        
-    if(!inputs.length && !output.length)
+
+    if (!inputs.length && !output.length)
       Logger.warn(this, 'no plugs');
   }
 
