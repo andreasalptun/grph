@@ -66,7 +66,87 @@ delay.output().connectTo(print.input());
 
 Test it with something like `curl localhost:8080/api/calc-square/3` (depending on your server setup). It should respond with `{value:9}` immediately and then print the request value to the console after a 2.5 second delay.
 
-### How to run the attached example
+## List of included nodes
+Plug configs can often be a string (name), object or number (count), or an array thereof. The config object always accepts the properties `name` and `count`, and other node specific.
+
+### Basic nodes
+
+#### SplitNode
+Splits the input to multiple outputs
+```js
+config = {
+  outputPlugs: 2,
+}
+```
+
+#### PrintNode
+
+TODO
+
+### Timing nodes
+
+#### DelayNode
+Forwards the input to the corresponding output after N seconds.
+```js
+config = {
+  plugs: 1, // Number of inputs/outputs
+  time: 1.0, // Delay time in seconds
+}
+```
+
+#### ScheduleNode
+Sends a singnal to the output according to the schedule. Can be a cron-like string or a Date object. See https://www.npmjs.com/package/cron.
+```js
+config = {
+  schedule: '0 * * * * *' // cron-string or Date object
+}
+```
+
+#### PulseNode
+
+TODO
+
+### Networking nodes
+
+#### HttpNode
+
+Waits for requests on the registered route. The entire request body is attached to the signal. If plug has `response:true`, then an input plug is automatically created to receive the response. Requires express js app.
+```js
+config = {
+  route: '/api/:plug/:value',
+  method: 'GET', // default
+  plugs: [
+    'request-without-response', 
+    {
+      name: 'request-with-response',
+      response: true
+    }
+  ]
+}
+```
+
+### Raspberry Pi nodes
+
+#### GpioNode
+
+TODO
+
+
+### Synology DiskStation nodes
+
+These nodes requires the url and the credentials to be configured in the env, e.g:
+
+```dotenv
+SYNOLOGY_URL=https://hostname:5001/webapi
+SYNOLOGY_USER=my-user
+SYNOLOGY_PASSWORD=my-password
+```
+
+#### SynoState (Surveillance Station)
+
+Gets or sets the home state of the Synology surveillance station app. This node has no configuration, just one pushed output `is-home` and one input `set-home`.
+
+## How to run the attached example
 
 `node -r dotenv/config test.js`
 
