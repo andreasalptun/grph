@@ -33,6 +33,7 @@ class Output extends Plug {
     } else if (typeof(filter) === 'string') {
       this.filter = standardFilters[filter];
       if (typeof(this.filter) !== 'function') {
+        this.filter = standardFilters['pass-through'];
         throw new Error(`Filter \'${filter}\' does not exist. Available standard filters: ${Object.keys(standardFilters).join(',')}`);
       }
     } else if (!filter) {

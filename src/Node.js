@@ -178,7 +178,7 @@ class Node {
     if (outputs.length > 0)
       Logger.info(this, 'output plugs (' + (outputs.map(output => output.name).join(', ') || '-') + ')');
 
-    if (!inputs.length && !output.length)
+    if (!inputs.length && !outputs.length)
       Logger.warn(this, 'no plugs');
   }
 

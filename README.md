@@ -137,7 +137,7 @@ TODO
 These nodes requires the url and the credentials to be configured in the env, e.g:
 
 ```dotenv
-SYNOLOGY_URL=https://hostname:5001/webapi
+SYNOLOGY_URL=https://my-hostname:5001/webapi
 SYNOLOGY_USER=my-user
 SYNOLOGY_PASSWORD=my-password
 ```

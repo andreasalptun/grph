@@ -36,12 +36,12 @@ const levels = {
 }
 
 const verbosity = {
-  common: Logger.WARN
+  base: Logger.WARN
 };
 
 function print(obj, level, args) {
   const name = (obj || {}).name;
-  if (level <= (verbosity[name] || verbosity.common)) {
+  if (level <= (verbosity[name] || verbosity.base)) {
     levels[level].func.call(
       null,
       [levels[level].color(`[${levels[level].title}]`),
@@ -55,7 +55,7 @@ module.exports = Object.assign(Logger, {
   setLevel(name, level) {
     if (typeof(level) === 'undefined') {
       level = name;
-      name = 'common';
+      name = 'base';
     }
     verbosity[name] = level;
   },
