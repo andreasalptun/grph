@@ -20,7 +20,7 @@ app.listen(process.env.HTTP_LISTEN_PORT, process.env.HTTP_LISTEN_ADDR, async () 
     route: '/api/v1/:plug/:value?',
     plugs: ['set-pulse-duration', {
       name: 'multiply-2',
-      hasResponseInput: true
+      response: true
     }]
   });
   
