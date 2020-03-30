@@ -124,7 +124,7 @@ class GpioMock {
     Node.log.warn(this, 'gpio not accessible');
   }
   watch(fn) {
-    if (stringToBoolean(process.env.RPI_GPIO_SIMULATE_INTERRUPTS)) {
+    if (stringToBoolean(process.env.RPI_GPIO_SIMULATE_INTERRUPTS || '')) {
       setInterval(() => {
         if (this.interrupt == Node.RISE && this.interruptValue == 1 ||
           this.interrupt == Node.FALL && this.interruptValue == 0 ||

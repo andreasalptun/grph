@@ -54,6 +54,11 @@ function parsePlugs(type, defaultName, ...plugs) {
     );
   }
 
+  // // Print parsed plugs
+  // console.log(plugs.reduce((array, entry) => array.concat(entry), []) // Merge arguments
+  //   .filter(entry => entry) // Remove null entries
+  //   .reduce(unroll, [])
+  // );
 
   return deepCopy(plugs
     .reduce((array, entry) => array.concat(entry), []) // Merge arguments
