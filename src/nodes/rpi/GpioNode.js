@@ -1,14 +1,12 @@
 const Node = require('../../Node');
 const Gpio = require('onoff').Gpio;
 
-const stringToBoolean = require('to-boolean');
-
 // {
 //   inputPlugs: [{
-//     outputPin: 6,
+//     gpio: 6,
 //   }],
 //   outputPlugs: [{
-//     inputPin: 26,
+//     gpio: 26,
 //     interrupt: Node.RISE,
 //   }]
 // }
@@ -29,33 +27,33 @@ class GpioNode extends Node {
     this.initPlugs(this.inputPlugs, this.outputPlugs, {
       afterParsingInput: input => {
         if(!input.pushed) {
-          if (typeof(input.outputPin) !== 'number') {
-            throw new Error('Input plug missing required argument outputPin');
+          if (typeof(input.gpio) !== 'number') {
+            throw new Error('Input plug missing required argument gpio');
           }
-          input.gpio = Gpio.accessible ?
-          new Gpio(input.outputPin, Node.util.toBoolean(input.initValue) ? 'high' : 'low') :
-          new GpioMock(input.outputPin);
+          input._gpio = Gpio.accessible ?
+          new Gpio(input.gpio, Node.util.toBoolean(input.initValue) ? 'high' : 'low') :
+          new GpioMock(input.gpio);
           delete input.initValue;
         }
         return true;
       },
       afterParsingOutput: output => {
-        if (typeof(output.inputPin) !== 'number') {
-          throw new Error('Output plug missing required argument inputPin');
+        if (typeof(output.gpio) !== 'number') {
+          throw new Error('Output plug missing required argument gpio');
         }
         if (output.interrupt) {
           const edge = edgeTbl[output.interrupt];
           if (!edge) {
             throw new Error(`Invalid trigger, must be Node.{RISE,FALL,CHANGE}, was ${output.interrupt}`);
           }
-          output.gpio = Gpio.accessible ?
-            new Gpio(output.inputPin, 'in', edge) :
-            new GpioMock(output.inputPin, output.interrupt);
+          output._gpio = Gpio.accessible ?
+            new Gpio(output.gpio, 'in', edge) :
+            new GpioMock(output.gpio, output.interrupt);
         }
         else {
-          output.gpio = Gpio.accessible ?
-            new Gpio(output.inputPin, 'in') :
-            new GpioMock(output.inputPin);
+          output._gpio = Gpio.accessible ?
+            new Gpio(output.gpio, 'in') :
+            new GpioMock(output.gpio);
           output.pushed = true;
         }
         return true;
@@ -65,8 +63,8 @@ class GpioNode extends Node {
     this.setProcessor(Node.PUSHED, async (input, data) => {
       try {
         const pushOutput = this.output(input.pushOutputName);
-        const value = Node.util.toBoolean(await pushOutput.gpio.read());
-        Node.log.info(this, `push gpio[${pushOutput.inputPin}]:${value} > ${input.desc}`)
+        const value = Node.util.toBoolean(await pushOutput._gpio.read());
+        Node.log.info(this, `GPIO${pushOutput.gpio} > ${value} > ${pushOutput.desc} (pushed)`)
         pushOutput.send(value);
       } catch(e) {
         Node.log.error(this, e.message);
@@ -75,9 +73,9 @@ class GpioNode extends Node {
     
     this.setProcessor(Node.CATCH, async (input, data) => {
       const value = Node.util.toBoolean(data.value);
-      Node.log.info(this, `${input.desc}:${value} > gpio[${input.outputPin}]`)
+      Node.log.info(this, `${input.desc} > ${value} > GPIO${input.gpio}`)
       try {
-        await input.gpio.write(value);
+        await input._gpio.write(value);
       } catch (e) {
         Node.log.error(this, e.message);
       }
@@ -89,13 +87,14 @@ class GpioNode extends Node {
   startInterrupts() {
     if (!this.watchingInterrupts) {
       this.outputs
-        .filter(output => output.gpio && output.interrupt)
+        .filter(output => output._gpio && output.interrupt)
         .forEach(output => {
-          Node.log.info(this, `watching interrupts on gpio[${output.inputPin}] for output ${output.name}`);
-          output.gpio.watch((err, value) => {
+          Node.log.info(this, `watching interrupts on GPIO${output.gpio} for output ${output.name}`);
+          output._gpio.watch((err, value) => {
             if (err) {
               Node.log.warn(this, err.message);
             } else {
+              Node.log.info(this, `GPIO${output.gpio} > ${value} > ${output.desc} (interrupt)`)
               output.send(value);
             }
           });
@@ -107,8 +106,8 @@ class GpioNode extends Node {
   stopInterrupts() {
     if (this.watchingInterrupts) {
       this.outputs
-        .filter(output => output.gpio && output.interrupt)
-        .forEach(output => output.gpio.unwatchAll());
+        .filter(output => output._gpio && output.interrupt)
+        .forEach(output => output._gpio.unwatchAll());
       this.watchingInterrupts = false;
     }
   }
@@ -124,6 +123,8 @@ class GpioMock {
     Node.log.warn(this, 'gpio not accessible');
   }
   watch(fn) {
+    const stringToBoolean = require('to-boolean');
+
     if (stringToBoolean(process.env.RPI_GPIO_SIMULATE_INTERRUPTS || '')) {
       setInterval(() => {
         if (this.interrupt == Node.RISE && this.interruptValue == 1 ||
@@ -148,3 +149,4 @@ class GpioMock {
 }
 
 module.exports = GpioNode;
+
